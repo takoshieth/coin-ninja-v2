@@ -87,6 +87,21 @@
   canvas.addEventListener("touchmove",e=>{const t=e.touches[0],r=canvas.getBoundingClientRect();onMove(t.clientX-r.left,t.clientY-r.top)},{passive:true});
   window.addEventListener("touchend",onUp);
 
+  // 🔹 FARCASTER SDK — init immediately
+let farcasterReadyCalled = false;
+(async () => {
+  try {
+    const { sdk } = await import('@farcaster/miniapp-sdk');
+    // Call as early as possible, but only once
+    await sdk.actions.ready();
+    console.log('✅ Farcaster MiniApp ready() called early');
+    farcasterReadyCalled = true;
+  } catch (err) {
+    console.warn('⚠️ Farcaster SDK not available:', err);
+  }
+})();
+
+
   function onReady(){
     resize();
     startBtn.onclick=()=>{menu.classList.add("hidden"); startGame();};
@@ -335,4 +350,5 @@
     console.warn('Farcaster SDK not available:', err);
   }
 })();
+
 

@@ -1,4 +1,4 @@
-// COIN NINJA v3.1 — Classic Mode (higher jumps)
+// COIN NINJA v4.0 — Classic Mode + High Jump + Fever Mode
 (() => {
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
@@ -32,9 +32,15 @@
   const btnDownloadImage = document.getElementById("btnDownloadImage");
   const btnShare = document.getElementById("btnShare");
 
+  // Floating texts
   const comboText = document.createElement("div");
   comboText.id = "comboText";
   document.body.appendChild(comboText);
+
+  const feverText = document.createElement("div");
+  feverText.id = "feverText";
+  feverText.textContent = "🔥 FEVER MODE!";
+  document.body.appendChild(feverText);
 
   let W, H, DPR;
   function resize() {
@@ -46,7 +52,7 @@
   }
   window.addEventListener("resize", resize);
 
-  // Görseller
+  // Images
   const coins = ["bnb","pepe","btc","doge","hype","xrp","eth","solana"];
   const images = {};
   const toLoad = {
@@ -60,17 +66,24 @@
     img.onload=()=>{ loaded++; if(loaded===Object.keys(toLoad).length) onReady(); };
   });
 
+  // Game state
   let running=false, score=0, time=0, lives=3;
-  let entities=[], gravity=750;       // ↓ azalan gravity = daha uzun uçuş
+  let entities=[];
+  let gravity=720;                 // ↓ biraz daha düşük: daha uzun uçuş
   let baseSpawnInterval=900;
   let spawnInterval=baseSpawnInterval, lastSpawn=0;
 
+  // Fever Mode
+  let fever=false;
+  let feverTimer=0;                // saniye
+  const FEVER_DURATION = 6;        // 6s
+  const FEVER_MULT = 2;            // 2x puan
+
+  // Input
   const trail=[]; const MAX_TRAIL=12;
   let pointerDown=false, lastX=0,lastY=0;
 
-  function addPoint(x,y){
-    trail.push({x,y,t:performance.now()}); if(trail.length>MAX_TRAIL) trail.shift();
-  }
+  function addPoint(x,y){ trail.push({x,y,t:performance.now()}); if(trail.length>MAX_TRAIL) trail.shift(); }
   function onDown(x,y){ pointerDown=true; addPoint(x,y); lastX=x; lastY=y; }
   function onMove(x,y){ if(!pointerDown) return; addPoint(x,y); checkSlice(lastX,lastY,x,y); lastX=x; lastY=y; }
   function onUp(){ pointerDown=false; }
@@ -95,41 +108,33 @@
     btnDownloadImage.onclick=downloadScoreImage;
     btnShare.onclick=shareOnTwitter;
 
-    tabLeaderboard.onclick=()=>{
-      tabLeaderboard.classList.add("active"); tabWinners.classList.remove("active");
-      leaderboardContent.classList.remove("hidden"); winnersContent.classList.add("hidden");
-    };
-    tabWinners.onclick=()=>{
-      tabWinners.classList.add("active"); tabLeaderboard.classList.remove("active");
-      winnersContent.classList.remove("hidden"); leaderboardContent.classList.add("hidden");
-      showWinners();
-    };
+    tabLeaderboard.onclick=()=>{ tabLeaderboard.classList.add("active"); tabWinners.classList.remove("active"); leaderboardContent.classList.remove("hidden"); winnersContent.classList.add("hidden"); };
+    tabWinners.onclick=()=>{ tabWinners.classList.add("active"); tabLeaderboard.classList.remove("active"); winnersContent.classList.remove("hidden"); leaderboardContent.classList.add("hidden"); showWinners(); };
 
     drawMenuBG();
     resetIfNewDay();
   }
 
+  // Start / End
   function startGame(){
     running=true; score=0; time=0; lives=3;
     entities.length=0; trail.length=0;
     spawnInterval=baseSpawnInterval; lastSpawn=0;
-    scoreEl.textContent="0"; comboEl.textContent="Combo x1";
-    updateLivesUI();
+    fever=false; feverTimer=0; document.body.classList.remove("fever");
+    scoreEl.textContent="0"; comboEl.textContent="Combo x1"; updateLivesUI();
     hud.classList.remove("hidden");
+    hideFeverText();
     requestAnimationFrame(loop);
   }
-
-  function updateLivesUI(){
-    livesEl.textContent="💚".repeat(Math.max(0,lives));
-  }
-
   function endGame(){
     running=false;
     hud.classList.add("hidden");
     finalScoreEl.textContent=score;
     gameoverPanel.classList.remove("hidden");
   }
+  function updateLivesUI(){ livesEl.textContent="💚".repeat(Math.max(0,lives)); }
 
+  // Entities
   class Entity{
     constructor(kind){
       this.kind=kind;
@@ -137,11 +142,14 @@
       this.x = margin + Math.random() * (canvas.clientWidth - margin*2);
       this.y = canvas.clientHeight + 40;
 
-      // 🚀 Fırlatma gücü artırıldı
-      const speed = 650 + Math.random() * 200;   // önceki: 550 + 150
-      const angleDeg = -60 - Math.random()*60;
+      // 🚀 Çok daha yüksek zıplama
+      const speed = 850 + Math.random() * 300;   // 850–1150 px/s
+      // Daha dik açı – ekranın %80–90’ına çıkabilsin:
+      const angleDeg = -65 - Math.random()*50;   // -65° .. -115°
       const rad = angleDeg * Math.PI/180;
-      this.vx = Math.cos(rad) * speed * (Math.random()>0.5?1:-1) * 0.25;
+
+      // Yatay çeşitlilik
+      this.vx = Math.cos(rad) * speed * (Math.random()>0.5?1:-1) * 0.28;
       this.vy = Math.sin(rad) * speed;
 
       this.r = 55;
@@ -169,9 +177,19 @@
     draw(ctx){
       const img=images[this.kind]; if(!img) return;
       const s=this.r*2;
-      ctx.save(); ctx.translate(this.x,this.y); ctx.rotate(this.angle);
+      ctx.save();
+      ctx.translate(this.x,this.y);
+      ctx.rotate(this.angle);
+
+      // Fever sırasında coinlere hafif neon parlama konturu
+      if(fever && this.kind!=="bomb"){
+        ctx.shadowBlur = 18;
+        ctx.shadowColor = "rgba(61,242,157,.9)";
+      }
       ctx.drawImage(img,-s/2,-s/2,s,s);
+
       if(this.kind==="bomb"){
+        ctx.shadowBlur = 0;
         ctx.strokeStyle="rgba(255,60,60,.45)";
         ctx.lineWidth=5; ctx.beginPath(); ctx.arc(0,0,this.r+3,0,Math.PI*2); ctx.stroke();
       }
@@ -179,22 +197,26 @@
     }
   }
 
+  // Spawn
   function spawn(){
     const now=performance.now();
     if(now-lastSpawn<spawnInterval) return;
     lastSpawn=now;
 
-    const batch = Math.min(2 + Math.floor(time/25), 4);
+    const batch = Math.min(2 + Math.floor(time/25), 5);
     for(let i=0;i<batch;i++){
       setTimeout(()=>{
         const isBomb = Math.random() < Math.min(0.08 + time*0.002, 0.22);
         const kind = isBomb ? "bomb" : coins[(Math.random()*coins.length)|0];
         entities.push(new Entity(kind));
-      }, i*110);
+      }, i*100);
     }
-    spawnInterval = Math.max(420, baseSpawnInterval - time*12);
+    // Zorluk artışı
+    const feverBonus = fever ? 80 : 0;
+    spawnInterval = Math.max(380, baseSpawnInterval - time*12 - feverBonus);
   }
 
+  // Slice / Combo / Fever
   function lineIntersectsCircle(x1,y1,x2,y2,cx,cy,r){
     const A=cx-x1,B=cy-y1,C=x2-x1,D=y2-y1;
     const dot=A*C+B*D,len=C*C+D*D; let t=dot/len; t=Math.max(0,Math.min(1,t));
@@ -210,24 +232,60 @@
         if(e.kind==="bomb"){
           e.alive=false; navigator.vibrate?.(80); endGame(); return;
         }else{
-          e.alive=false; slicedKinds.push(e.kind);
-          score += 10; scoreEl.textContent = score;
+          e.alive=false;
+          slicedKinds.push(e.kind);
+          let gain = 10;
+          if(fever) gain *= FEVER_MULT; // fever 2x
+          score += gain;
+          scoreEl.textContent = score;
           flashes.push({x:e.x,y:e.y,t:0});
           navigator.vibrate?.(15);
         }
       }
     }
+
     if(slicedKinds.length>1){
       const same = slicedKinds.every(k=>k===slicedKinds[0]);
       if(same){
         const bonus = slicedKinds.length===2 ? 5 : slicedKinds.length===3 ? 10 : 15;
-        score += bonus;
+        const totalBonus = fever ? bonus*FEVER_MULT : bonus;
+        score += totalBonus;
         scoreEl.textContent = score;
         showCombo(slicedKinds.length);
+
+        // 3+ aynı tür coin tek hamlede → Fever başlat
+        if(slicedKinds.length >= 3) activateFever();
       }
     }
   }
 
+  // Fever controls
+  function activateFever(){
+    fever = true;
+    feverTimer = FEVER_DURATION;
+    document.body.classList.add("fever");
+    scoreEl.parentElement.classList.add("fever-score");
+    showFeverText();
+  }
+  function updateFever(dt){
+    if(!fever) return;
+    feverTimer -= dt;
+    if(feverTimer <= 0){
+      fever = false;
+      feverTimer = 0;
+      document.body.classList.remove("fever");
+      scoreEl.parentElement.classList.remove("fever-score");
+      hideFeverText();
+    }
+  }
+  function showFeverText(){
+    feverText.style.opacity = 1;
+  }
+  function hideFeverText(){
+    feverText.style.opacity = 0;
+  }
+
+  // VFX
   const flashes=[];
   function drawFlashes(dt){
     for(const f of flashes){
@@ -240,13 +298,11 @@
     }
     for(let i=flashes.length-1;i>=0;i--) if(flashes[i].t>0.4) flashes.splice(i,1);
   }
-
   function showCombo(n){
     comboText.textContent=`🔥 COMBO x${n}!`;
     comboText.style.opacity=1;
     setTimeout(()=>comboText.style.opacity=0,900);
   }
-
   function drawTrail(){
     if(trail.length<2) return;
     ctx.save(); ctx.lineCap="round"; ctx.lineJoin="round";
@@ -260,11 +316,14 @@
     ctx.restore();
   }
 
+  // Loop
   let lastTime=performance.now();
   function loop(){
     if(!running) return;
     const now=performance.now(); let dt=(now-lastTime)/1000; dt=Math.min(dt,0.033); lastTime=now;
     time+=dt;
+    updateFever(dt);
+
     ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
     spawn();
     entities.forEach(e=>e.update(dt));
@@ -275,6 +334,7 @@
     requestAnimationFrame(loop);
   }
 
+  // Menu BG
   function drawMenuBG(){
     resize(); ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
     ctx.save(); ctx.globalAlpha=.18; const s=40; ctx.strokeStyle="#2a364d";
@@ -283,7 +343,7 @@
     ctx.restore();
   }
 
-  // Leaderboard ve paylaşım sistemi aynı kaldı ↓
+  // Leaderboard / Winners (değişmedi)
   function readLB(){try{return JSON.parse(localStorage.getItem("coinNinjaLB"))||[]}catch{return[]}}
   function writeLB(a){localStorage.setItem("coinNinjaLB",JSON.stringify(a.slice(0,100)));}
   function readWinners(){try{return JSON.parse(localStorage.getItem("coinNinjaWinners"))||[]}catch{return[]}}
@@ -299,7 +359,6 @@
     writeLB(lb);
     showLeaderboard();
   }
-
   function showLeaderboard(){
     const lb=readLB().sort((a,b)=>b.score-a.score||a.ts-b.ts).slice(0,20);
     lbList.innerHTML=lb.map((e,i)=>`<li><strong>${i+1}.</strong> ${escapeHtml(e.name)} — <b>${e.score}</b></li>`).join("");
@@ -309,7 +368,6 @@
     const w=readWinners();
     winnersList.innerHTML=w.map(e=>`<li><span class="crown">👑</span> ${e.date} — ${escapeHtml(e.name)} — Score ${e.score}</li>`).join("");
   }
-
   function resetIfNewDay(){
     const today=new Date().toISOString().slice(0,10);
     const lastDate=localStorage.getItem("coinNinjaDate");
@@ -325,6 +383,7 @@
     }
   }
 
+  // Share
   function downloadScoreImage(){
     const DPR = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
     const tmp=document.createElement("canvas");
@@ -352,5 +411,6 @@
     window.open(intent,"_blank");
   }
 
+  // utils
   function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 })();

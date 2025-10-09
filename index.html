@@ -17,12 +17,7 @@
       }
     }
   }' />  
-  <script type="module">
-  import { sdk } from "@farcaster/miniapp-sdk";
-  sdk.actions.ready().then(() => {
-    console.log("✅ MiniApp ready() called from <head> inline script");
-  }).catch(console.error);
-</script>
+<script src="https://unpkg.com/@farcaster/miniapp-sdk@latest/dist/miniapp-sdk.umd.js"></script>
 
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -128,5 +123,6 @@
   <script src="game.js"></script>
 </body>
 </html>
+
 
 

@@ -309,13 +309,14 @@
     link.click();
   }
   function shareOnTwitter(){
-    const text=encodeURIComponent(`I scored ${score} in COIN NINJA! ⚔️🪙 Try to beat me!`);
-    const url=encodeURIComponent(window.location.href);
-    const intent=`https://twitter.com/intent/tweet?text=${text}&url=${url}&via=takoshieth`;
-    window.open(intent,"_blank");
-})();  // <--- end code!
+    const text = encodeURIComponent(`I scored ${score} in COIN NINJA! ⚔️🪙 Try to beat me!`);
+    const url = encodeURIComponent(window.location.href);
+    const intent = `https://twitter.com/intent/tweet?text=${text}&url=${url}&via=takoshieth`;
+    window.open(intent, "_blank");
+  }
+})(); // <-- bu satır, oyunun ana fonksiyonunu kapatır! BURAYA KADAR OYUN
 
-// 🔹 Farcaster MiniApp SDK entegre
+// 🔹 Farcaster MiniApp SDK entegrasyonu
 (async () => {
   try {
     const { sdk } = await import('@farcaster/miniapp-sdk');

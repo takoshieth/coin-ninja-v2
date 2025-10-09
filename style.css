@@ -1,0 +1,237 @@
+:root {
+  --bg: #0b0f14;
+  --panel: #111826;
+  --text: #EAF2FF;
+  --acc: #3DF29D;
+  --muted: #7a8aa0;
+  --crown: gold;
+}
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  background: radial-gradient(1200px 800px at 50% 0%, #0b1220, #070a0f) fixed;
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  overflow: hidden;
+}
+#app {
+  height: 100%;
+}
+
+/* 🔝 Top Bar */
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  background: linear-gradient(180deg, rgba(10,14,20,.9), rgba(10,14,20,.3));
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  z-index: 5;
+}
+.topbar .buttons button {
+  margin-left: 8px;
+}
+.logo-small {
+  height: 40px;
+  width: auto;
+}
+
+/* 🏠 Main Menu */
+.panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(10,14,20,.92);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: 24px;
+  width: min(92vw, 520px);
+  z-index: 6;
+  text-align: center;
+}
+.panel.hidden { display: none; }
+.panel h1 {
+  margin: 10px 0 0;
+}
+.panel .tagline {
+  color: var(--muted);
+  font-size: 14px;
+}
+.logo-large {
+  width: 200px;
+  margin-bottom: 10px;
+}
+
+.nft-info {
+  margin: 16px 0;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.nft-info .highlight {
+  color: var(--acc);
+}
+.opensea-link img {
+  width: 48px;
+  margin-top: 6px;
+  transition: transform .2s;
+}
+.opensea-link img:hover {
+  transform: scale(1.1);
+}
+
+/* 🎮 Game HUD */
+.hud {
+  position: fixed;
+  top: 60px; left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  z-index: 4;
+  pointer-events: none;
+}
+.hud.hidden { display: none; }
+.hud .score {
+  font-weight: 800;
+  font-size: 18px;
+  background: rgba(0,0,0,.35);
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.08);
+}
+.combo {
+  font-weight: 700;
+  font-size: 18px;
+  opacity: .85;
+  text-shadow: 0 0 8px var(--acc);
+}
+
+/* ✨ Combo Floating Text */
+#comboText {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--acc);
+  text-shadow: 0 0 12px var(--acc);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 20;
+}
+
+/* 🕹️ Canvas */
+canvas#game {
+  position: absolute;
+  inset: 0;
+  top: 56px;
+  height: calc(100% - 56px);
+  width: 100%;
+  background: radial-gradient(800px 500px at 50% 100%, rgba(61,242,157,.06), rgba(0,0,0,.25));
+}
+
+/* 🧩 Buttons */
+button {
+  background: #1b2435;
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,.08);
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+button.primary {
+  background: var(--acc);
+  color: #001b0d;
+  border: none;
+}
+button:active {
+  transform: scale(.98);
+}
+
+/* 📘 Modal Windows */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.5);
+  z-index: 10;
+}
+.modal.hidden { display: none; }
+
+.modal-content {
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 20px;
+  width: min(90vw, 500px);
+  text-align: left;
+  color: var(--text);
+}
+
+/* 🏆 Leaderboard Tabs */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.tab {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.tab.active {
+  background: var(--acc);
+  color: #001b0d;
+}
+.crown {
+  color: var(--crown);
+  margin-right: 4px;
+}
+
+/* 🏆 Leaderboard Lists */
+ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+ol li {
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+/* 🎬 Animations */
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+@keyframes fadeOut {
+  from {opacity: 1;}
+  to {opacity: 0;}
+}
+
+@media (max-width: 420px) {
+  .logo-large { width: 150px; }
+  .logo-small { height: 32px; }
+}

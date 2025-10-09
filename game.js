@@ -1,4 +1,5 @@
 // COIN NINJA v4.1 — Smart Spawn + Expanded Combo + Fever Mode + Daily Winners
+import { sdk } from '@farcaster/miniapp-sdk';
 (() => {
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
@@ -102,6 +103,9 @@
     tabLeaderboard.onclick=()=>{tabLeaderboard.classList.add("active");tabWinners.classList.remove("active");leaderboardContent.classList.remove("hidden");winnersContent.classList.add("hidden");};
     tabWinners.onclick=()=>{tabWinners.classList.add("active");tabLeaderboard.classList.remove("active");winnersContent.classList.remove("hidden");leaderboardContent.classList.add("hidden");showWinners();};
     drawMenuBG(); resetIfNewDay();
+    // Notify Farcaster that the app is ready
+    sdk.actions.ready().catch(console.error);
+ 
   }
 
   function startGame(){
@@ -314,3 +318,4 @@
     window.open(intent,"_blank");
   }
 })();
+

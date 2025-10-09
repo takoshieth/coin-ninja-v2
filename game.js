@@ -1,4 +1,4 @@
-// COIN NINJA v3 — Classic Mode
+// COIN NINJA v3.1 — Classic Mode (higher jumps)
 (() => {
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
@@ -32,12 +32,10 @@
   const btnDownloadImage = document.getElementById("btnDownloadImage");
   const btnShare = document.getElementById("btnShare");
 
-  // Üstte görünen COMBO yazısı
   const comboText = document.createElement("div");
   comboText.id = "comboText";
   document.body.appendChild(comboText);
 
-  // Ekran ölçekleme
   let W, H, DPR;
   function resize() {
     DPR = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
@@ -62,15 +60,11 @@
     img.onload=()=>{ loaded++; if(loaded===Object.keys(toLoad).length) onReady(); };
   });
 
-  // Oyun durumu
-  let running=false, score=0, time=0;
-  let lives=3;
-  let entities=[];               // sahnedeki coin & bomb’lar
-  let gravity=800;               // px/s^2 — Classic Mode hissi
-  let baseSpawnInterval=900;     // ms
+  let running=false, score=0, time=0, lives=3;
+  let entities=[], gravity=750;       // ↓ azalan gravity = daha uzun uçuş
+  let baseSpawnInterval=900;
   let spawnInterval=baseSpawnInterval, lastSpawn=0;
 
-  // Giriş izleme
   const trail=[]; const MAX_TRAIL=12;
   let pointerDown=false, lastX=0,lastY=0;
 
@@ -115,7 +109,6 @@
     resetIfNewDay();
   }
 
-  // === Classic Mode başlangıcı
   function startGame(){
     running=true; score=0; time=0; lives=3;
     entities.length=0; trail.length=0;
@@ -127,9 +120,7 @@
   }
 
   function updateLivesUI(){
-    // Neon yeşil kalpler
-    const heart="💚";
-    livesEl.textContent = heart.repeat(Math.max(0,lives));
+    livesEl.textContent="💚".repeat(Math.max(0,lives));
   }
 
   function endGame(){
@@ -142,24 +133,22 @@
   class Entity{
     constructor(kind){
       this.kind=kind;
-      // Fırlatma konumu: tabandan rastgele, kenarlara yakın başlayıp içeri doğru açı verelim
       const margin = 50;
       this.x = margin + Math.random() * (canvas.clientWidth - margin*2);
       this.y = canvas.clientHeight + 40;
 
-      // Classic fiziği: başlangıç hızı ve açı
-      // hız: 550–700 px/s, açı: -60° .. -120° arası (yukarı doğru)
-      const speed = 550 + Math.random()*150;
+      // 🚀 Fırlatma gücü artırıldı
+      const speed = 650 + Math.random() * 200;   // önceki: 550 + 150
       const angleDeg = -60 - Math.random()*60;
       const rad = angleDeg * Math.PI/180;
-      this.vx = Math.cos(rad) * speed * (Math.random()>0.5?1:-1) * 0.25; // yatay çeşitlilik
+      this.vx = Math.cos(rad) * speed * (Math.random()>0.5?1:-1) * 0.25;
       this.vy = Math.sin(rad) * speed;
 
       this.r = 55;
       this.spin = (Math.random()*2-1)*2.2;
       this.angle = 0;
       this.alive = true;
-      this.missed = false; // ekrandan kaçtı mı?
+      this.missed = false;
     }
     update(dt){
       this.vy += gravity*dt;
@@ -167,7 +156,6 @@
       this.y += this.vy*dt;
       this.angle += this.spin*dt;
 
-      // Ekran dışına düştü mü?
       if(this.y > canvas.clientHeight + 80 && this.alive){
         this.alive=false;
         if(this.kind!=="bomb" && !this.missed){
@@ -196,7 +184,6 @@
     if(now-lastSpawn<spawnInterval) return;
     lastSpawn=now;
 
-    // 2–4’lü dalgalar (Fruit Ninja hissi)
     const batch = Math.min(2 + Math.floor(time/25), 4);
     for(let i=0;i<batch;i++){
       setTimeout(()=>{
@@ -205,12 +192,9 @@
         entities.push(new Entity(kind));
       }, i*110);
     }
-
-    // Zorluk artışı: zamanla daha sık spawn
     spawnInterval = Math.max(420, baseSpawnInterval - time*12);
   }
 
-  // Dilimleme (aynı hamlede aynı tür combo)
   function lineIntersectsCircle(x1,y1,x2,y2,cx,cy,r){
     const A=cx-x1,B=cy-y1,C=x2-x1,D=y2-y1;
     const dot=A*C+B*D,len=C*C+D*D; let t=dot/len; t=Math.max(0,Math.min(1,t));
@@ -224,15 +208,10 @@
       if(!e.alive) continue;
       if(lineIntersectsCircle(x1,y1,x2,y2,e.x,e.y,e.r)){
         if(e.kind==="bomb"){
-          e.alive=false;
-          navigator.vibrate?.(80);
-          endGame();
-          return;
+          e.alive=false; navigator.vibrate?.(80); endGame(); return;
         }else{
-          e.alive=false;
-          slicedKinds.push(e.kind);
-          score += 10;                      // temel puan
-          scoreEl.textContent = score;
+          e.alive=false; slicedKinds.push(e.kind);
+          score += 10; scoreEl.textContent = score;
           flashes.push({x:e.x,y:e.y,t:0});
           navigator.vibrate?.(15);
         }
@@ -241,7 +220,6 @@
     if(slicedKinds.length>1){
       const same = slicedKinds.every(k=>k===slicedKinds[0]);
       if(same){
-        // 2 kesim = +5, 3 = +10, 4+ = +15
         const bonus = slicedKinds.length===2 ? 5 : slicedKinds.length===3 ? 10 : 15;
         score += bonus;
         scoreEl.textContent = score;
@@ -250,7 +228,6 @@
     }
   }
 
-  // Görsel efektler
   const flashes=[];
   function drawFlashes(dt){
     for(const f of flashes){
@@ -283,7 +260,6 @@
     ctx.restore();
   }
 
-  // Ana döngü
   let lastTime=performance.now();
   function loop(){
     if(!running) return;
@@ -292,14 +268,13 @@
     ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
     spawn();
     entities.forEach(e=>e.update(dt));
-    entities = entities.filter(e=>e.alive); // ölenleri ayıkla
+    entities = entities.filter(e=>e.alive);
     entities.forEach(e=>e.draw(ctx));
     drawFlashes(dt);
     drawTrail();
     requestAnimationFrame(loop);
   }
 
-  // Arkaplan ızgara (menü)
   function drawMenuBG(){
     resize(); ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
     ctx.save(); ctx.globalAlpha=.18; const s=40; ctx.strokeStyle="#2a364d";
@@ -308,7 +283,7 @@
     ctx.restore();
   }
 
-  // === Günlük leaderboard / winners (mevcut mantık korunur) ===
+  // Leaderboard ve paylaşım sistemi aynı kaldı ↓
   function readLB(){try{return JSON.parse(localStorage.getItem("coinNinjaLB"))||[]}catch{return[]}}
   function writeLB(a){localStorage.setItem("coinNinjaLB",JSON.stringify(a.slice(0,100)));}
   function readWinners(){try{return JSON.parse(localStorage.getItem("coinNinjaWinners"))||[]}catch{return[]}}
@@ -317,7 +292,7 @@
   function saveScore(ev){
     ev.preventDefault();
     const name=twInput.value.trim(); if(!name) return;
-    const wallet=walletInput.value.trim(); // gelecekte lazım olabilir
+    const wallet=walletInput.value.trim();
     const lb=readLB();
     lb.push({name, wallet, score, ts:Date.now()});
     lb.sort((a,b)=> b.score-a.score || a.ts-b.ts);
@@ -350,7 +325,6 @@
     }
   }
 
-  // Paylaşım / skor görseli
   function downloadScoreImage(){
     const DPR = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
     const tmp=document.createElement("canvas");
@@ -378,7 +352,5 @@
     window.open(intent,"_blank");
   }
 
-  // util
   function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-
 })();

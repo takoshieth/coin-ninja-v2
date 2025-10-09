@@ -314,23 +314,16 @@
     const intent = `https://twitter.com/intent/tweet?text=${text}&url=${url}&via=takoshieth`;
     window.open(intent, "_blank");
   }
-})(); // <-- end game
+})(); // <-- bu satır, oyunun ana fonksiyonunu kapatır! BURAYA KADAR OYUN
 window.addEventListener("load", async () => {
-  let sdk;
-  for (let i = 0; i < 10; i++) {
-    sdk = window.FarcasterMiniAppSDK?.sdk;
-    if (sdk) break;
-    await new Promise(r => setTimeout(r, 300)); // SDK yüklenmesini bekle
-  }
-
-  if (sdk) {
+  try {
+    const { sdk } = await import("@farcaster/miniapp-sdk");
     await sdk.actions.ready();
-    console.log("✅ Farcaster MiniApp ready() called successfully after wait");
-  } else {
-    console.warn("⚠️ SDK not found even after waiting");
+    console.log("✅ Farcaster MiniApp ready() called successfully after window load");
+  } catch (err) {
+    console.warn("⚠️ Farcaster SDK not available:", err);
   }
 });
-
 
 
 

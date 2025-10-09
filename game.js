@@ -1,15 +1,17 @@
 // COIN NINJA v4.1 — Smart Spawn + Expanded Combo + Fever Mode + Daily Winners
-// ✅ FARCASTER MINIAPP SDK — Trigger display as soon as DOM is ready
-(async () => {
+window.addEventListener("load", async () => {
   try {
-    const { sdk } = await import("@farcaster/miniapp-sdk");
-    sdk.actions.ready().then(() => {
-      console.log("✅ Farcaster MiniApp ready() called successfully.");
-    });
+    const sdk = window.FarcasterMiniAppSDK?.sdk;
+    if (sdk) {
+      await sdk.actions.ready();
+      console.log("✅ Farcaster MiniApp ready() called successfully (CDN version)");
+    } else {
+      console.warn("⚠️ Farcaster SDK not found in window context");
+    }
   } catch (err) {
-    console.warn("⚠️ Farcaster SDK not available or not in Farcaster context:", err);
+    console.error("❌ Error calling sdk.actions.ready():", err);
   }
-})();
+});
 
 (() => {
   const canvas = document.getElementById("game");
@@ -327,6 +329,7 @@
     window.open(intent, "_blank");
   }
 })(); // <-- end game
+
 
 
 

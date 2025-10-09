@@ -22,7 +22,7 @@
     "screenshotUrls": [
       "https://coin-ninja-v2.vercel.app/assets/screen1.png"
     ],
-    "primaryCategory": "game",
+    "primaryCategory": "games",
     "tags": ["arcade", "crypto", "miniapp", "base"],
     "heroImageUrl": "https://coin-ninja-v2.vercel.app/assets/og.png",
     "tagline": "Slice coins. Win NFTs.",
@@ -32,3 +32,4 @@
     "noindex": false
   }
 }
+

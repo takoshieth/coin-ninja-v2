@@ -117,16 +117,6 @@ let farcasterReadyCalled = false;
     tabLeaderboard.onclick=()=>{tabLeaderboard.classList.add("active");tabWinners.classList.remove("active");leaderboardContent.classList.remove("hidden");winnersContent.classList.add("hidden");};
     tabWinners.onclick=()=>{tabWinners.classList.add("active");tabLeaderboard.classList.remove("active");winnersContent.classList.remove("hidden");leaderboardContent.classList.add("hidden");showWinners();};
     drawMenuBG(); resetIfNewDay();
- // 🔹 Notify Farcaster MiniApp that the game is ready to display
-(async () => {
-  try {
-    const { sdk } = await import('@farcaster/miniapp-sdk');
-    await sdk.actions.ready();
-    console.log('✅ Farcaster MiniApp: ready() called after game fully loaded');
-  } catch (err) {
-    console.warn('Farcaster SDK not available:', err);
-  }
-})();
 }
 
   function startGame(){
@@ -350,5 +340,6 @@ let farcasterReadyCalled = false;
     console.warn('Farcaster SDK not available:', err);
   }
 })();
+
 
 

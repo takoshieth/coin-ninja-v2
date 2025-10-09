@@ -8,6 +8,7 @@
 </head>
 <body>
   <div id="app">
+    <!-- 🔝 TOP BAR -->
     <div class="topbar">
       <img src="assets/logo.png" alt="Coin Ninja" class="logo-small" />
       <div class="buttons">
@@ -40,6 +41,7 @@
     <div id="hud" class="hud hidden">
       <div class="score">Score: <span id="score">0</span></div>
       <div class="combo" id="combo">Combo x1</div>
+      <div class="lives" id="lives">💚💚💚</div>
     </div>
 
     <!-- 🕹️ GAME CANVAS -->
@@ -76,10 +78,10 @@
         <h3>How to Play</h3>
         <ul>
           <li>Swipe to slice coins — but avoid the <strong>DUMP</strong> bomb.</li>
-          <li>Slicing multiple coins of the same type in one move triggers a COMBO!</li>
-          <li>Difficulty increases over time.</li>
-          <li>Daily leaderboard resets every UTC midnight.</li>
-          <li>Top player each day wins a Virgen Club NFT 👑</li>
+          <li>You start with <strong>3 lives 💚💚💚</strong>.</li>
+          <li>Each missed coin costs 1 life. When all lives are gone — game over!</li>
+          <li>Slicing multiple same-type coins in one move gives COMBO bonus.</li>
+          <li>Difficulty increases over time — stay sharp!</li>
         </ul>
         <button id="closeHow">Close</button>
       </div>

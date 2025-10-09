@@ -313,6 +313,9 @@
     const url=encodeURIComponent(window.location.href);
     const intent=`https://twitter.com/intent/tweet?text=${text}&url=${url}&via=takoshieth`;
     window.open(intent,"_blank");
+})();  // <--- end code!
+
+// 🔹 Farcaster MiniApp SDK entegre
 (async () => {
   try {
     const { sdk } = await import('@farcaster/miniapp-sdk');
@@ -322,5 +325,3 @@
     console.warn('Farcaster SDK not available:', err);
   }
 })();
-
-

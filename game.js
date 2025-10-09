@@ -1,5 +1,4 @@
 // COIN NINJA v4.1 — Smart Spawn + Expanded Combo + Fever Mode + Daily Winners
-import { sdk } from '@farcaster/miniapp-sdk';
 (() => {
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
@@ -103,8 +102,6 @@ import { sdk } from '@farcaster/miniapp-sdk';
     tabLeaderboard.onclick=()=>{tabLeaderboard.classList.add("active");tabWinners.classList.remove("active");leaderboardContent.classList.remove("hidden");winnersContent.classList.add("hidden");};
     tabWinners.onclick=()=>{tabWinners.classList.add("active");tabLeaderboard.classList.remove("active");winnersContent.classList.remove("hidden");leaderboardContent.classList.add("hidden");showWinners();};
     drawMenuBG(); resetIfNewDay();
-    // Notify Farcaster that the app is ready
-    sdk.actions.ready().catch(console.error);
  
   }
 
@@ -316,6 +313,14 @@ import { sdk } from '@farcaster/miniapp-sdk';
     const url=encodeURIComponent(window.location.href);
     const intent=`https://twitter.com/intent/tweet?text=${text}&url=${url}&via=takoshieth`;
     window.open(intent,"_blank");
+(async () => {
+  try {
+    const { sdk } = await import('@farcaster/miniapp-sdk');
+    await sdk.actions.ready();
+    console.log('Farcaster MiniApp is ready ✅');
+  } catch (err) {
+    console.warn('Farcaster SDK not available:', err);
   }
 })();
+
 

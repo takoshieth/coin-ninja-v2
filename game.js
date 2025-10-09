@@ -314,12 +314,12 @@
     const intent = `https://twitter.com/intent/tweet?text=${text}&url=${url}&via=takoshieth`;
     window.open(intent, "_blank");
   }
-})(); // <-- bu satır, oyunun ana fonksiyonunu kapatır! BURAYA KADAR OYUN
+})(); // <-- end game
 window.addEventListener("load", async () => {
   try {
     const { sdk } = await import("@farcaster/miniapp-sdk");
     await sdk.actions.ready();
-    console.log("✅ Farcaster MiniApp ready() called successfully after window load");
+    console.log("✅ Farcaster MiniApp ready() called successfully");
   } catch (err) {
     console.warn("⚠️ Farcaster SDK not available:", err);
   }

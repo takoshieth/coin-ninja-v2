@@ -1,19 +1,4 @@
 // COIN NINJA v4.1 — Smart Spawn + Expanded Combo + Fever Mode + Daily Winners
-window.addEventListener("load", async () => {
-  let sdk;
-  for (let i = 0; i < 10; i++) {
-    sdk = window.FarcasterMiniAppSDK?.sdk;
-    if (sdk) break;
-    await new Promise(r => setTimeout(r, 300)); // SDK yüklenmesini bekle
-  }
-
-  if (sdk) {
-    await sdk.actions.ready();
-    console.log("✅ Farcaster MiniApp ready() called successfully after wait");
-  } else {
-    console.warn("⚠️ SDK not found even after waiting");
-  }
-});
 (() => {
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
@@ -330,6 +315,21 @@ window.addEventListener("load", async () => {
     window.open(intent, "_blank");
   }
 })(); // <-- end game
+window.addEventListener("load", async () => {
+  let sdk;
+  for (let i = 0; i < 10; i++) {
+    sdk = window.FarcasterMiniAppSDK?.sdk;
+    if (sdk) break;
+    await new Promise(r => setTimeout(r, 300)); // SDK yüklenmesini bekle
+  }
+
+  if (sdk) {
+    await sdk.actions.ready();
+    console.log("✅ Farcaster MiniApp ready() called successfully after wait");
+  } else {
+    console.warn("⚠️ SDK not found even after waiting");
+  }
+});
 
 
 

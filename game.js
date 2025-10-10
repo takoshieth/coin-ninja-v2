@@ -324,13 +324,14 @@
 // Oyunun tüm lifecycle'ı yüklendikten sonra
 window.addEventListener("load", async () => {
   // Farcaster SDK başlat
-  try {
-    const { init } = await import("https://esm.sh/@farcaster/miniapp-sdk@0.2.0");
-    await init();
-    console.log("✅ Farcaster SDK initialized");
-  } catch (e) {
-    console.warn("⚠️ Farcaster SDK init failed", e);
-  }
+const { sdk } = await import("https://esm.sh/@farcaster/miniapp-sdk");
+try {
+  await sdk.actions.ready();
+  console.log("✅ Farcaster SDK ready()");
+} catch (err) {
+  console.warn("⚠️ Farcaster SDK not available:", err);
+}
+
 
   // KV'ye skor kaydetme (local fallback ile uyumlu)
   const originalSave = window.saveScore;

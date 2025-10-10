@@ -14,6 +14,7 @@
     "name": "Coin Ninja",
     "homeUrl": "https://coin-ninja-v2.vercel.app",
     "iconUrl": "https://coin-ninja-v2.vercel.app/assets/logo.png",
+    "castShareUrl": "https://coin-ninja-v2.vercel.app",
     "splashImageUrl": "https://coin-ninja-v2.vercel.app/splash.png",
     "splashBackgroundColor": "#020202",
     "webhookUrl": "https://coin-ninja-v2.vercel.app/api/webhook",
@@ -33,6 +34,7 @@
     "noindex": false
   }
 }
+
 
 
 

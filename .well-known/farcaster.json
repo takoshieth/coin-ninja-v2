@@ -16,6 +16,8 @@
     "iconUrl": "https://coin-ninja-v2.vercel.app/assets/logo.png",
     "castShareUrl": "https://coin-ninja-v2.vercel.app",
     "splashImageUrl": "https://coin-ninja-v2.vercel.app/splash.png",
+    "imageUrl": "https://coin-ninja-v2.vercel.app/assets/logo.png",
+    "buttonTitle": "Play Now", 
     "splashBackgroundColor": "#020202",
     "webhookUrl": "https://coin-ninja-v2.vercel.app/api/webhook",
     "subtitle": "Slice coins. Avoid bombs.",
@@ -34,6 +36,7 @@
     "noindex": false
   }
 }
+
 
 
 

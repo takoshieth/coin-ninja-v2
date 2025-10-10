@@ -20,15 +20,22 @@
   <link rel="stylesheet" href="style.css" />
 
   <!-- ✅ Farcaster MiniApp SDK -->
-  <script type="module">
-    import { init } from "https://esm.sh/@farcaster/miniapp-sdk@0.2.0";
-    window.addEventListener("load", async () => {
-      try {
-        await init();
-        console.log("✅ Farcaster SDK initialized");
-      } catch (err) {
-        console.warn("⚠️ Farcaster SDK init failed:", err);
-      }
+<script type="module">
+  import { sdk } from "https://esm.sh/@farcaster/miniapp-sdk";
+  window.farcasterSDK = sdk;
+
+  async function setupFarcaster() {
+    try {
+      await sdk.actions.ready();
+      console.log("✅ Farcaster SDK ready()");
+    } catch (err) {
+      console.warn("⚠️ Farcaster SDK not available:", err);
+    }
+  }
+
+  window.addEventListener("load", setupFarcaster);
+</script>
+
     });
   </script>
 </head>

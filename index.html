@@ -58,7 +58,7 @@
     </div>
 
     <!-- 🕹️ GAME CANVAS -->
-    <canvas id="game" style="touch-action:none;-ms-touch-action:none;"></canvas>
+    <canvas id="game"></canvas>
 
     <!-- 💥 GAME OVER -->
     <div id="gameover" class="panel hidden">
@@ -117,21 +117,6 @@
       </div>
     </div>
   </div>
-
-  
-  <!-- Farcaster Mini App SDK via ESM CDN -->
-  <script type="module">
-    import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk';
-    window.farcasterSDK = sdk;
-    window.addEventListener('load', async () => {
-      try {
-        await sdk.actions.ready();
-        console.log('[Farcaster] sdk.actions.ready() called.');
-      } catch (err) {
-        console.warn('[Farcaster] SDK not available or ready() failed:', err);
-      }
-    });
-  </script>
 
   <script src="game.js"></script>
 </body>

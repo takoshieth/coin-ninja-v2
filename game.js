@@ -80,17 +80,12 @@
   function onMove(x,y){ if(!pointerDown) return; addPoint(x,y); checkSlice(lastX,lastY,x,y); lastX=x; lastY=y; }
   function onUp(){ pointerDown=false; }
 
-    // Unified pointer events for desktop & mobile (fixes click/touch issues)
-  canvas.addEventListener("pointerdown", e => {
-    const r = canvas.getBoundingClientRect();
-    onDown(e.clientX - r.left, e.clientY - r.top);
-  });
-  canvas.addEventListener("pointermove", e => {
-    if (!pointerDown) return;
-    const r = canvas.getBoundingClientRect();
-    onMove(e.clientX - r.left, e.clientY - r.top);
-  });
-  window.addEventListener("pointerup", onUp);
+  canvas.addEventListener("mousedown",e=>onDown(e.offsetX,e.offsetY));
+  canvas.addEventListener("mousemove",e=>onMove(e.offsetX,e.offsetY));
+  window.addEventListener("mouseup",onUp);
+  canvas.addEventListener("touchstart",e=>{const t=e.touches[0],r=canvas.getBoundingClientRect();onDown(t.clientX-r.left,t.clientY-r.top)},{passive:true});
+  canvas.addEventListener("touchmove",e=>{const t=e.touches[0],r=canvas.getBoundingClientRect();onMove(t.clientX-r.left,t.clientY-r.top)},{passive:true});
+  window.addEventListener("touchend",onUp);
 
 
   function onReady(){
@@ -267,16 +262,55 @@
     const wallet=walletInput.value.trim();
     const lb=readLB(); lb.push({name,wallet,score,ts:Date.now()});
     lb.sort((a,b)=>b.score-a.score||a.ts-b.ts); writeLB(lb);
+    
+    // Fire-and-forget: also persist to server KV
+    try {
+      fetch('/api/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ twitter: name, wallet, score })
+      });
+    } catch (e) { console.warn('POST /api/score failed', e); }
     showLeaderboard();
   }
   function showLeaderboard(){
+    try {
+      const r = await fetch('/api/leaderboard');
+      const j = await r.json();
+      if (r.ok && Array.isArray(j.items)) {
+        lbList.innerHTML = j.items
+          .slice(0, 20)
+          .map((e, i) => `<li><strong>${i + 1}.</strong> ${e.twitter} — <b>${e.score}</b></li>`)
+          .join("");
+        modalLb.classList.remove("hidden");
+        return;
+      }
+    } catch (err) {
+      console.warn('leaderboard fetch failed, fallback to local', err);
+    }
+    // Fallback to local
     const lb=readLB().sort((a,b)=>b.score-a.score||a.ts-b.ts).slice(0,20);
     lbList.innerHTML=lb.map((e,i)=>`<li><strong>${i+1}.</strong> ${e.name} — <b>${e.score}</b></li>`).join("");
     modalLb.classList.remove("hidden");
+
   }
   function showWinners(){
+    try {
+      const r = await fetch('/api/winners');
+      const j = await r.json();
+      if (r.ok && Array.isArray(j.items) && j.items.length) {
+        winnersList.innerHTML = j.items
+          .map(e => `<li><span class="crown">👑</span> ${e.date} — ${e.twitter} — Score ${e.score}</li>`)
+          .join("");
+        return;
+      }
+    } catch (err) {
+      console.warn('winners fetch failed, fallback to local', err);
+    }
+    // Fallback to local
     const w=readWinners();
     winnersList.innerHTML=w.map(e=>`<li><span class="crown">👑</span> ${e.date} — ${e.name} — Score ${e.score}</li>`).join("");
+
   }
   function resetIfNewDay(){
     const today=new Date().toISOString().slice(0,10);
@@ -320,3 +354,17 @@
     window.open(intent, "_blank");
   }
 })(); // <-- bu satır, oyunun ana fonksiyonunu kapatır! BURAYA KADAR OYUN
+window.addEventListener("load", async () => {
+  try {
+    const { sdk } = await import("@farcaster/miniapp-sdk");
+    await sdk.actions.ready();
+    console.log("✅ Farcaster MiniApp ready() called successfully after window load");
+  } catch (err) {
+    console.warn("⚠️ Farcaster SDK not available:", err);
+  }
+});
+
+
+
+
+

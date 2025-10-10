@@ -1,125 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-  <title>Coin Ninja</title>
-  <!-- ✅ Farcaster MiniApp Metadata -->
-  <meta name="fc:miniapp" content='{
-    "version": "next",
-    "imageUrl": "https://coin-ninja-v2.vercel.app/og.png",
-    "button": {
-      "title": "Play Now",
-      "action": {
-        "type": "launch_miniapp",
-        "name": "Coin Ninja",
-        "url": "https://coin-ninja-v2.vercel.app"
-      }
-    }
-  }' />  
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div id="app">
-    <!-- 🔝 TOP BAR -->
-    <div class="topbar">
-      <img src="assets/logo.png" alt="Coin Ninja" class="logo-small" />
-      <div class="buttons">
-        <button id="btnHow">How to Play</button>
-        <button id="btnLeaderboard">Leaderboard</button>
-      </div>
-    </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coin Ninja</title>
+    <link rel="stylesheet" href="style.css" />
 
-    <!-- 🏠 MAIN MENU -->
-    <div id="menu" class="panel">
-      <img src="assets/logo.png" alt="Coin Ninja Logo" class="logo-large" />
+    <!-- ✅ Farcaster MiniApp SDK -->
+    <script type="module">
+      import { init } from "https://esm.sh/@farcaster/miniapp-sdk@0.2.0";
+      window.addEventListener("load", async () => {
+        try {
+          await init();
+          console.log("✅ Farcaster SDK initialized");
+        } catch (err) {
+          console.warn("⚠️ Farcaster SDK init failed:", err);
+        }
+      });
+    </script>
+  </head>
+
+  <body>
+    <!-- 🕹️ Main Menu -->
+    <div id="modalStart">
       <h1>Coin Ninja</h1>
-      <p class="tagline">Slice the coins. Avoid the <strong>DUMP</strong> bomb.</p>
-
-      <div class="nft-info">
-        <p><strong>Daily Leaderboard Reward:</strong><br>
-        Each day’s #1 player wins <span class="highlight">1 Virgen Club NFT!</span></p>
-        <div class="opensea-link">
-          <a href="https://opensea.io/collection/thevirgenclub" target="_blank">
-            <img src="assets/opensea.png" alt="OpenSea" />
-          </a>
-        </div>
-      </div>
-
-      <button id="btnStart" class="primary">Start Game</button>
-      <div class="credits">Created by <a href="https://twitter.com/takoshieth" target="_blank">@takoshieth</a></div>
+      <button id="btnStart">Play</button>
+      <button id="btnLeaderboard">Leaderboard</button>
+      <button id="btnWinners">Daily Winners</button>
     </div>
 
-    <!-- 🎮 HUD -->
-    <div id="hud" class="hud hidden">
-      <div class="score">Score: <span id="score">0</span></div>
-      <div class="combo" id="combo">Combo x1</div>
-      <div class="lives" id="lives">💚💚💚</div>
+    <!-- 🎮 Game Canvas -->
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+
+    <!-- 🏆 Leaderboard -->
+    <div id="modalLeaderboard" class="hidden">
+      <h2>Leaderboard</h2>
+      <ul id="lbList"></ul>
+      <button id="btnMenu">Back</button>
     </div>
 
-    <!-- 🕹️ GAME CANVAS -->
-    <canvas id="game"></canvas>
+    <!-- 👑 Daily Winners -->
+    <div id="modalWinners" class="hidden">
+      <h2>Daily Winners</h2>
+      <ul id="winnersList"></ul>
+      <button id="btnMenu2">Back</button>
+    </div>
 
-    <!-- 💥 GAME OVER -->
-    <div id="gameover" class="panel hidden">
-      <h2>Game Over 💥</h2>
-      <p>Your Score: <span id="finalScore">0</span></p>
+    <!-- 💾 Game Over -->
+    <div id="modalGameOver" class="hidden">
+      <h2>Game Over</h2>
       <form id="saveForm">
-        <div class="row">
-          <label>Twitter Username</label>
-          <input id="twitter" type="text" placeholder="@nickname" required/>
-        </div>
-        <div class="row">
-          <label>Wallet Address</label>
-          <input id="wallet" type="text" placeholder="0x..." />
-        </div>
-        <div class="buttons">
-          <button type="submit" class="primary">Save to Leaderboard</button>
-          <button id="btnDownloadImage" type="button">Download Score Image</button>
-          <button id="btnShare" type="button">Share on Twitter</button>
-        </div>
+        <input id="twitter" placeholder="Enter X Username" required />
+        <input id="wallet" placeholder="Enter Wallet Address (optional)" />
+        <button type="submit">Save Score</button>
       </form>
-      <div class="buttons mt">
-        <button id="btnRestart">Play Again</button>
-        <button id="btnMenu">Main Menu</button>
-      </div>
     </div>
 
-    <!-- 📘 HOW TO PLAY -->
-    <div id="modalHow" class="modal hidden">
-      <div class="modal-content">
-        <h3>How to Play</h3>
-        <ul>
-          <li>Swipe to slice coins — but avoid the <strong>DUMP</strong> bomb.</li>
-          <li>You start with <strong>3 lives 💚💚💚</strong>.</li>
-          <li>Each missed coin costs 1 life. When all lives are gone — game over!</li>
-          <li>Slicing multiple same-type coins in one move gives COMBO bonus.</li>
-          <li>Difficulty increases over time — stay sharp!</li>
-        </ul>
-        <button id="closeHow">Close</button>
-      </div>
-    </div>
-
-    <!-- 🏆 LEADERBOARD -->
-    <div id="modalLeaderboard" class="modal hidden">
-      <div class="modal-content">
-        <div class="tabs">
-          <button id="tabLeaderboard" class="tab active">Leaderboard</button>
-          <button id="tabWinners" class="tab"><span class="crown">👑</span> Daily Winners</button>
-        </div>
-        <div id="leaderboardContent">
-          <ol id="lbList"></ol>
-        </div>
-        <div id="winnersContent" class="hidden">
-          <ol id="winnersList"></ol>
-        </div>
-        <button id="closeLb">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="game.js"></script>
-</body>
+    <!-- ✅ Game Logic -->
+    <script defer src="game.js"></script>
+  </body>
 </html>
-
-

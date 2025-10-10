@@ -261,56 +261,23 @@
     const name=twInput.value.trim(); if(!name) return;
     const wallet=walletInput.value.trim();
     const lb=readLB(); lb.push({name,wallet,score,ts:Date.now()});
-    lb.sort((a,b)=>b.score-a.score||a.ts-b.ts); writeLB(lb);
-    
-    // Fire-and-forget: also persist to server KV
-    try {
-      fetch('/api/score', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ twitter: name, wallet, score })
-      });
-    } catch (e) { console.warn('POST /api/score failed', e); }
-    showLeaderboard();
+    lb.sort((a,b)=>b.score-a.score||a.ts-b.ts); \1
+    // Persist to server KV (non-blocking)
+    try { fetch('/api/score', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ twitter: name, wallet, score })
+    }); } catch(e){ console.warn('POST /api/score failed', e); }
+\2
   }
   function showLeaderboard(){
-    try {
-      const r = await fetch('/api/leaderboard');
-      const j = await r.json();
-      if (r.ok && Array.isArray(j.items)) {
-        lbList.innerHTML = j.items
-          .slice(0, 20)
-          .map((e, i) => `<li><strong>${i + 1}.</strong> ${e.twitter} — <b>${e.score}</b></li>`)
-          .join("");
-        modalLb.classList.remove("hidden");
-        return;
-      }
-    } catch (err) {
-      console.warn('leaderboard fetch failed, fallback to local', err);
-    }
-    // Fallback to local
     const lb=readLB().sort((a,b)=>b.score-a.score||a.ts-b.ts).slice(0,20);
     lbList.innerHTML=lb.map((e,i)=>`<li><strong>${i+1}.</strong> ${e.name} — <b>${e.score}</b></li>`).join("");
     modalLb.classList.remove("hidden");
-
   }
   function showWinners(){
-    try {
-      const r = await fetch('/api/winners');
-      const j = await r.json();
-      if (r.ok && Array.isArray(j.items) && j.items.length) {
-        winnersList.innerHTML = j.items
-          .map(e => `<li><span class="crown">👑</span> ${e.date} — ${e.twitter} — Score ${e.score}</li>`)
-          .join("");
-        return;
-      }
-    } catch (err) {
-      console.warn('winners fetch failed, fallback to local', err);
-    }
-    // Fallback to local
     const w=readWinners();
     winnersList.innerHTML=w.map(e=>`<li><span class="crown">👑</span> ${e.date} — ${e.name} — Score ${e.score}</li>`).join("");
-
   }
   function resetIfNewDay(){
     const today=new Date().toISOString().slice(0,10);

@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@farcaster/miniapp-sdk": "^0.2.0"
+    "@farcaster/miniapp-sdk": "^0.2.0",
+    "@vercel/kv": "^1.0.0"
   }
 }

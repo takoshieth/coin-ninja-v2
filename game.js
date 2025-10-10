@@ -80,12 +80,17 @@
   function onMove(x,y){ if(!pointerDown) return; addPoint(x,y); checkSlice(lastX,lastY,x,y); lastX=x; lastY=y; }
   function onUp(){ pointerDown=false; }
 
-  canvas.addEventListener("mousedown",e=>onDown(e.offsetX,e.offsetY));
-  canvas.addEventListener("mousemove",e=>onMove(e.offsetX,e.offsetY));
-  window.addEventListener("mouseup",onUp);
-  canvas.addEventListener("touchstart",e=>{const t=e.touches[0],r=canvas.getBoundingClientRect();onDown(t.clientX-r.left,t.clientY-r.top)},{passive:true});
-  canvas.addEventListener("touchmove",e=>{const t=e.touches[0],r=canvas.getBoundingClientRect();onMove(t.clientX-r.left,t.clientY-r.top)},{passive:true});
-  window.addEventListener("touchend",onUp);
+    // Unified pointer events for desktop & mobile (fixes click/touch issues)
+  canvas.addEventListener("pointerdown", e => {
+    const r = canvas.getBoundingClientRect();
+    onDown(e.clientX - r.left, e.clientY - r.top);
+  });
+  canvas.addEventListener("pointermove", e => {
+    if (!pointerDown) return;
+    const r = canvas.getBoundingClientRect();
+    onMove(e.clientX - r.left, e.clientY - r.top);
+  });
+  window.addEventListener("pointerup", onUp);
 
 
   function onReady(){
@@ -315,17 +320,3 @@
     window.open(intent, "_blank");
   }
 })(); // <-- bu satır, oyunun ana fonksiyonunu kapatır! BURAYA KADAR OYUN
-window.addEventListener("load", async () => {
-  try {
-    const { sdk } = await import("@farcaster/miniapp-sdk");
-    await sdk.actions.ready();
-    console.log("✅ Farcaster MiniApp ready() called successfully after window load");
-  } catch (err) {
-    console.warn("⚠️ Farcaster SDK not available:", err);
-  }
-});
-
-
-
-
-

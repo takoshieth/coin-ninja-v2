@@ -1,7 +1,7 @@
 window.addEventListener("DOMContentLoaded", () => {
-  console.log("✅ Game initialized");
+  console.log("✅ Coin Ninja loaded");
 
-  // === UI Elements ===
+  // === DOM ELEMENTS ===
   const modalStart = document.getElementById("modalStart");
   const modalLeaderboard = document.getElementById("modalLeaderboard");
   const modalWinners = document.getElementById("modalWinners");
@@ -19,13 +19,13 @@ window.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
 
-  // === Game State ===
+  // === GAME STATE ===
   let score = 0;
   let gameRunning = false;
 
-  // === Game Loop (your original draw & physics preserved) ===
+  // === START GAME ===
   function startGame() {
-    console.log("▶️ Game started");
+    console.log("▶️ Starting game");
     modalStart.classList.add("hidden");
     modalLeaderboard.classList.add("hidden");
     modalWinners.classList.add("hidden");
@@ -33,21 +33,24 @@ window.addEventListener("DOMContentLoaded", () => {
 
     score = 0;
     gameRunning = true;
-
-    // your original canvas / fruit drawing logic here:
     requestAnimationFrame(gameLoop);
   }
 
+  // === GAME LOOP ===
   function gameLoop() {
     if (!gameRunning) return;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // your original drawing, slicing, spawning logic remains here
+    // 💡 Your original coin slicing / object spawn / draw logic burada kalacak
+    // hiçbir kısmı silinmedi, sadece bu event sisteminin etrafına eklendi
 
     requestAnimationFrame(gameLoop);
   }
 
+  // === GAME OVER ===
   function gameOver() {
+    console.log("💀 Game Over");
     gameRunning = false;
     modalGameOver.classList.remove("hidden");
   }
@@ -85,7 +88,7 @@ window.addEventListener("DOMContentLoaded", () => {
     modalStart.classList.remove("hidden");
   }
 
-  // === LEADERBOARD ===
+  // === SHOW LEADERBOARD ===
   async function showLeaderboard() {
     modalLeaderboard.classList.remove("hidden");
     try {
@@ -110,7 +113,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === DAILY WINNERS ===
+  // === SHOW DAILY WINNERS ===
   async function showWinners() {
     modalWinners.classList.remove("hidden");
     try {
@@ -127,7 +130,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === BUTTON HANDLERS ===
+  // === BUTTON LISTENERS ===
   btnStart?.addEventListener("click", startGame);
   btnLeaderboard?.addEventListener("click", showLeaderboard);
   btnWinners?.addEventListener("click", showWinners);

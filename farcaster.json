@@ -1,0 +1,43 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjQxOTMyNCwidHlwZSI6ImF1dGgiLCJrZXkiOiIweEZDMDMxM0NCN0MwOTdkNTE1NTc0QzYwRTRGRTZiQjMzQmNhZGRjNTkifQ",
+    "payload": "eyJkb21haW4iOiJjb2luLW5pbmphLXYyLnZlcmNlbC5hcHAifQ",
+    "signature": "sHK3Z1zFj/oyfgqTm8eZJCXsd3LrkyK1esVba7ih2cl9yWnRHAJdoEfwbz72bsF3XtpSrL1csCI0OXJNkJJGPxs="
+  },
+  "baseBuilder": {
+    "allowedAddresses": [
+      "0xFC0313CB7C097d515574C60E4FE6bB33Bcaddc59"
+    ]
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Coin Ninja",
+    "homeUrl": "https://coin-ninja-v2.vercel.app",
+    "iconUrl": "https://coin-ninja-v2.vercel.app/assets/logo.png",
+    "castShareUrl": "https://coin-ninja-v2.vercel.app",
+    "splashImageUrl": "https://coin-ninja-v2.vercel.app/splash.png",
+    "imageUrl": "https://coin-ninja-v2.vercel.app/assets/logo.png",
+    "buttonTitle": "Play Now", 
+    "splashBackgroundColor": "#020202",
+    "webhookUrl": "https://coin-ninja-v2.vercel.app/api/webhook",
+    "subtitle": "Slice coins. Avoid bombs.",
+    "description": "A fast and fun arcade mini-game inspired by Fruit Ninja. Slice your favorite coins, avoid dumps, and climb the daily leaderboard to win a Virgen Club NFT!",
+    "screenshotUrls": [
+      "https://coin-ninja-v2.vercel.app/screen1.png",
+      "https://coin-ninja-v2.vercel.app/screen2.png"
+    ],
+    "primaryCategory": "games",
+    "tags": ["arcade", "crypto", "miniapp", "base"],
+    "heroImageUrl": "https://coin-ninja-v2.vercel.app/og.png",
+    "tagline": "Slice coins. Win NFTs.",
+    "ogTitle": "Coin Ninja — Slice to Earn",
+    "ogDescription": "Slice coins, dodge dumps, and compete for daily rewards.",
+    "ogImageUrl": "https://coin-ninja-v2.vercel.app/og.png",
+    "noindex": false
+  }
+}
+
+
+
+
+

@@ -6,7 +6,7 @@
   <title>Coin Ninja</title>
   <!-- ✅ Farcaster MiniApp Metadata -->
   <meta name="fc:miniapp" content='{
-    "version": "next",
+    "version": "1",
     "imageUrl": "https://coin-ninja-v2.vercel.app/og.png",
     "button": {
       "title": "Play Now",
@@ -14,6 +14,21 @@
         "type": "launch_miniapp",
         "name": "Coin Ninja",
         "url": "https://coin-ninja-v2.vercel.app"
+      }
+    }
+  }' />
+  <!-- ✅ Backward compatibility -->
+  <meta name="fc:frame" content='{
+    "version": "1",
+    "imageUrl": "https://coin-ninja-v2.vercel.app/og.png",
+    "button": {
+      "title": "Play Now",
+      "action": {
+        "type": "launch_frame",
+        "name": "Coin Ninja",
+        "url": "https://coin-ninja-v2.vercel.app",
+        "splashImageUrl": "https://coin-ninja-v2.vercel.app/assets/logo.png",
+        "splashBackgroundColor": "#0e1116"
       }
     }
   }' />  
